@@ -2,91 +2,104 @@ const port = 3000
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const cookieParser = require('cookie-parser');
+const expressSession = require('express-session');
 const userModel = require('./models/users')
 const postModel = require('./models/posts')
+const upload = require('./multer')
+const path = require('path')
 require('dotenv').config();
 
 
-const jwtSecret = process.env.JWT_SECRET;
+const secretKey = process.env.SECRET_KEY;
 
 
 // middlewares
 app.use(express.json())
 app.use(cors())
+app.use(cookieParser())
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware to verify JWT token
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401) // Unauthorized
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403) // Forbidden
-        req.user = user
-        next()
-    })
-}
+// passport setup 
+app.use(expressSession({
+    saveUninitialized: true,
+    resave: true,
+    secret: secretKey
+}))
 
 // Register endpoint
 app.post('/', async (req, res) => {
     try {
         // Extract user details from request body
-        const { username, email, password } = req.body
+        const { username, email, password } = req.body;
 
         // Check if user already exists
-        const existingUser = await userModel.findOne({ email })
+        const existingUser = await userModel.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' })
+            return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10)
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create a new user
+        // Create a new user document
         const newUser = new userModel({
             username: username,
             email: email,
             password: hashedPassword
-        })
+        });
 
-        // Save the user to the database
-        await newUser.save()
+        // Save the new user
+        await newUser.save();
 
-        // Generate JWT token
-        const accessToken = generateAccessToken({ username: newUser.username })
+        // Store user details in session
+        req.session.userDets = {
+            _id: newUser._id,
+            username: newUser.username,
+            email: newUser.email
+        };
 
-        res.status(200).json({ message: 'Registration successful' });
+        // Respond with user details
+        res.status(201).json({ user: req.session.userDets });
     } catch (error) {
-        console.error('Registration error:', error)
-        res.status(500).json({ error: 'Internal server error' })
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-})
+});
 
 
 // Login endpoint
-app.post('/login', async (req, res) => {
+app.post('/login',async function (req, res, next) {
     try {
-        // Extract username and password from request body
+        // Extract login credentials from request body
         const { username, password } = req.body;
-        
-        // Check if the user exists
+
+        // Find user by email
         const user = await userModel.findOne({ username });
+
         if (!user) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            // User not found
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
-        
-        // Compare the provided password with the hashed password stored in the database
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+
+        // Compare passwords
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            // Passwords do not match
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
-        
-        // If the username and password are valid, generate a JWT token
-        const accessToken = generateAccessToken({ username: user.username });
-        
-        res.status(200).json({ message: 'Login successful' });
+
+        // Store user details in session
+        req.session.userDets = {
+            _id: user._id,
+            username: user.username,
+            email: user.email
+        };
+
+        console.log(req.session.userDets);
+        // Respond with user details
+        res.json({ user: req.session.userDets });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -94,18 +107,40 @@ app.post('/login', async (req, res) => {
 });
 
 
-// Function to generate JWT token
-function generateAccessToken(user) {
-    if (!jwtSecret) {
-        throw new Error('JWT secret is not defined')
-    }
-    return jwt.sign(user, jwtSecret, { expiresIn: '1m' }) // Token expires in 15 minutes
-}
+app.get('/getuser', (req, res) => {
+    try {
+        console.log("Session user data:", req.session.userDets);
+        const user = req.session.userDets;
+        res.status(200).json({ user });
+    } catch(err) {
+        console.error('Error retrieving user data:', err);
+        res.status(400).send(err);
+    } 
+});
 
-app.post('/profileUpdate', async (req, res) => {
 
-})
+// app.post('/profileUpdate', upload.single('profileImg'), async (req, res) => {
+//     // console.log('File uploaded:', req.file.filename);
+//     // console.log(req.body.userId)
+//     const user = await userModel.findOne({ _id: req.body.userId });
+//     user.profile = `http://localhost:3000/uploads/${req.file.filename}`;
+//     await user.save()
+//     // Process the uploaded file, e.g., save it to a database or file system
+//     res.send(req.file.filename);
+// });
 
+
+// app.get('/uploads/:profile', (req, res) => {
+//     const filename = req.params.profile;
+//     res.sendFile(filename, { root: path.join(__dirname, 'public', 'uploads') });
+// })
+
+
+
+// function isLoggedIn(req, res, next) {
+//     if (req.isAuthenticated()) return next();
+//     res.redirect('http://localhost:5173/login');
+// }
 
 app.listen(port, () => {
     console.log('server started');

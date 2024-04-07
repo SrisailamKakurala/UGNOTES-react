@@ -2,35 +2,46 @@ import logo from '../assets/logo.png'
 import googleLogo from '../assets/googleLogo.png'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../Context/UserContext'
+
 
 const Login = () => {
-    const [alert, setAlert] = useState();
+    const navigate = useNavigate();
+    const { setUserData } = useUser();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState(false);
     const userData = {
         username: username,
         password: password
     }
 
-    const handleLogin = async (e) => {
+    const handleLogin = async () => {
         if (username !== '' && password !== '') {
             try {
                 const response = await axios.post('http://localhost:3000/login', userData);
-                console.log(response.data);
+                try{
+                    if(response.data.user){
+                        // store this user data in context
+                        setUserData(response.data.user);
+                        navigate('/home');
+                    }
+                }catch(err){
+                    setError(true);
+                }
             } catch (err) {
-                setError(err);
+                setError(true);
             }
         }
     }
 
     const usernameHandler = (e) => {
-        console.log(e.target.value)
         setUsername(e.target.value);
     }
 
     const passwordHandler = (e) => {
-        console.log(e.target.value)
         setPassword(e.target.value);
     }
 
@@ -42,6 +53,7 @@ const Login = () => {
                 </div>
                 <input onChange={usernameHandler} value={username} className='p-3 font-medium w-[95%] mx-auto ring-2 ring-pink-300 rounded-lg' type="text" placeholder='Username' />
                 <input onChange={passwordHandler} value={password} className='p-3 font-medium w-[95%] mx-auto ring-2 ring-pink-300 rounded-lg' type="password" placeholder='Password' />
+                {error && <p className='mx-auto text-red-600 text-shadow font-semibold'>Invalid Credentials</p>}
                 <input onClick={handleLogin} className='p-2 font-medium w-[35%] bg-pink-300 hover:bg-pink-400 duration-150 text-lg text-white cursor-pointer mx-auto ring-2 ring-pink-300 rounded-lg' type="button" value='Login' />
 
                 <div className="text-slate-500 flex justify-center"><h3 className="">or</h3></div>
@@ -50,7 +62,7 @@ const Login = () => {
                     <img className='w-6 h-6' src={googleLogo} alt="" />
                 </div>
                 <div className="flex justify-center text-sm">
-                    don't have an account? <Link className='text-blue-700 ml-2' to={'/signup'}>SignUp</Link>
+                    don't have an account? <Link className='text-blue-700 ml-2' to={'/'}>SignUp</Link>
                 </div>
             </div>
         </div>

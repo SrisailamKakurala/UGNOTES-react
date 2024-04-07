@@ -69,7 +69,7 @@ const Addnotes = () => {
           <div className="right lg:w-[50%] w-[100%] flex flex-col gap-5 xl:mt-0 lg:mt-0 mt-5 items-center">
             <input onChange={handleQualificationChange} required className="lg:w-[90%] w-[90%] p-3 rounded-md" placeholder="Enter the Qualification level, Ex: b-tech 2nd year" type="text" name="" id="" />
             <input required onChange={() => setFileSelected(true)} ref={fileRef} type="file" name="pdf-file" id="" accept=".pdf" className="hidden" />
-            <button onClick={OpenFiles} className="lg:w-[90%] w-[90%] p-3 rounded-md bg-[#dadada] shadow-xl text-lg font-bold">Upload pdf <i class="fa-solid fa-cloud-arrow-up"></i> </button>
+            <button onClick={OpenFiles} className="lg:w-[90%] w-[90%] p-3 rounded-md bg-[#dadada] shadow-xl text-lg font-bold">Upload pdf <i className="fa-solid fa-cloud-arrow-up"></i> </button>
             <p className="">{fileSelected ? "File Uploaded" : ""}</p>
 
             {/* submit */}

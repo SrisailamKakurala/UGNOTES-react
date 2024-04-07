@@ -2,14 +2,17 @@ import logo from '../assets/logo.png'
 import googleLogo from '../assets/googleLogo.png'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../Context/UserContext'
 
 const Signup = () => {
-
+    const navigate = useNavigate();
+    const { setUserData } = useUser();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
     const userData = {
         username: username,
         email: email,
@@ -19,27 +22,31 @@ const Signup = () => {
     const handleSignup = async (e) => {
         if (username !== '' && password !== '' && email !== '') {
             try {
-                const response = await axios.post('http://localhost:3000/', userData);
-                console.log(response.data);
+                const response = await axios.post('http://localhost:3000/', userData);  
+                try{
+                    if(response.data.user){
+                        // store this user data in context
+                        setUserData(response.data.user);
+                        navigate('/home');
+                    }
+                }catch(err){
+                    setError(true);
+                }
             } catch (err) {
                 setError(true);
-                setErrorMsg(err);
             }
         }
     }
 
     const usernameHandler = (e) => {
-        console.log(e.target.value)
         setUsername(e.target.value);
     }
 
     const emailHandler = (e) => {
-        console.log(e.target.value)
         setEmail(e.target.value);
     }
 
     const passwordHandler = (e) => {
-        console.log(e.target.value)
         setPassword(e.target.value);
     }
     return (
@@ -51,7 +58,7 @@ const Signup = () => {
                 <input onChange={usernameHandler} value={username} className='p-3 font-medium w-[95%] mx-auto ring-2 ring-pink-300 rounded-lg' type="text" placeholder='Username' />
                 <input onChange={emailHandler} value={email} className='p-3 font-medium w-[95%] mx-auto ring-2 ring-pink-300 rounded-lg' type="email" placeholder='Email' />
                 <input onChange={passwordHandler} value={password} className='p-3 font-medium w-[95%] mx-auto ring-2 ring-pink-300 rounded-lg' type="password" placeholder='Password' />
-                
+                {error && <p className='mx-auto text-red-600 text-shadow font-semibold'>User Already Exists</p>}
                 <input onClick={handleSignup} className='p-2 font-medium w-[35%] bg-pink-300 hover:bg-pink-400 duration-150 text-lg text-white cursor-pointer mx-auto ring-2 ring-pink-300 rounded-lg' type="button" value='Signup' />
 
 
@@ -61,7 +68,7 @@ const Signup = () => {
                     <img className='w-6 h-6' src={googleLogo} alt="" />
                 </div>
                 <div className="flex justify-center text-sm">
-                    already have an account? <Link className='text-blue-700 ml-2' to={'/'}>Login</Link>
+                    already have an account? <Link className='text-blue-700 ml-2' to={'/login'}>Login</Link>
                 </div>
             </div>
         </div>

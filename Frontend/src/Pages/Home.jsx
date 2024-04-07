@@ -1,8 +1,33 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Navbar from "../Components/Navbar"
 import Pdf from "../Components/Pdf"
+import { useUser } from "../Context/UserContext"
+import axios from 'axios';
 
 const Home = () => {
+
+  const { userData, setUserData } = useUser();
+
+  useEffect(() => {
+    async function getUserData() {
+      try {
+        // get user details
+        const response = await axios.get('http://localhost:3000/getuser');
+        setUserData(response.data);
+        // console.log(response)
+        console.log(response.data)
+
+        // SEND USERDATA_ID TO BACKEND AND RECIEVE THE USER PROFILE IMG AND ADD TO CONTEXT 
+        // setUserProfile(`http://localhost:3000/uploads/${filename}`)
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        // Handle error, e.g., show an error message
+      }
+    }
+
+    getUserData()
+  }, [])
+  
   const [option, setOption] = useState('')
 
   const handleOptionChange = (e) => {
