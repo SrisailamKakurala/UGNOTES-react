@@ -7,11 +7,17 @@ const postSchema = new mongoose.Schema({
     topics: String,
     qualification: String,
     filename: String,
-    likes: Number,
-    author: {
+    likes: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
+        }
+    ],
+    authorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    author: String,
     postedDate: {
         type: Date,
         default: Date.now()

@@ -4,12 +4,10 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../Context/UserContext'
 
 
 const Login = () => {
     const navigate = useNavigate();
-    const { setUserData } = useUser();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
@@ -21,15 +19,12 @@ const Login = () => {
     const handleLogin = async () => {
         if (username !== '' && password !== '') {
             try {
+                const userData = { username, password };
                 const response = await axios.post('http://localhost:3000/login', userData);
-                try{
-                    if(response.data.user){
-                        // store this user data in context
-                        setUserData(response.data.user);
-                        navigate('/home');
-                    }
-                }catch(err){
-                    setError(true);
+                if (response.data) {
+                    // Store user data in local storage
+                    localStorage.setItem('userData', JSON.stringify(response.data.user));
+                    navigate('/home');
                 }
             } catch (err) {
                 setError(true);
@@ -56,11 +51,11 @@ const Login = () => {
                 {error && <p className='mx-auto text-red-600 text-shadow font-semibold'>Invalid Credentials</p>}
                 <input onClick={handleLogin} className='p-2 font-medium w-[35%] bg-pink-300 hover:bg-pink-400 duration-150 text-lg text-white cursor-pointer mx-auto ring-2 ring-pink-300 rounded-lg' type="button" value='Login' />
 
-                <div className="text-slate-500 flex justify-center"><h3 className="">or</h3></div>
+                {/* <div className="text-slate-500 flex justify-center"><h3 className="">or</h3></div>
                 <div className="p-3 flex gap-3 justify-center font-medium w-[95%] mx-auto bg-black hover:bg-slate-950 cursor-pointer duration-0 rounded-lg text-white">
                     <h3 className="">Login with Google</h3>
                     <img className='w-6 h-6' src={googleLogo} alt="" />
-                </div>
+                </div> */}
                 <div className="flex justify-center text-sm">
                     don't have an account? <Link className='text-blue-700 ml-2' to={'/'}>SignUp</Link>
                 </div>

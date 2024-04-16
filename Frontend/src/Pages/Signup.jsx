@@ -4,33 +4,29 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../Context/UserContext'
 
 const Signup = () => {
     const navigate = useNavigate();
-    const { setUserData } = useUser();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
-    const userData = {
+    const userdata = {
         username: username,
         email: email,
         password: password
     }
 
+
     const handleSignup = async (e) => {
         if (username !== '' && password !== '' && email !== '') {
             try {
-                const response = await axios.post('http://localhost:3000/', userData);  
-                try{
-                    if(response.data.user){
-                        // store this user data in context
-                        setUserData(response.data.user);
-                        navigate('/home');
-                    }
-                }catch(err){
-                    setError(true);
+                const userdata = { username, email, password };
+                const response = await axios.post('http://localhost:3000/', userdata);
+                if (response.data.newUser) {
+                    // Store user data in local storage
+                    localStorage.setItem('userData', JSON.stringify(response.data.newUser));
+                    navigate('/home');
                 }
             } catch (err) {
                 setError(true);
@@ -62,11 +58,11 @@ const Signup = () => {
                 <input onClick={handleSignup} className='p-2 font-medium w-[35%] bg-pink-300 hover:bg-pink-400 duration-150 text-lg text-white cursor-pointer mx-auto ring-2 ring-pink-300 rounded-lg' type="button" value='Signup' />
 
 
-                <div className="text-slate-500 flex justify-center"><h3 className="">or</h3></div>
+                {/* <div className="text-slate-500 flex justify-center"><h3 className="">or</h3></div>
                 <div className="p-3 flex gap-3 justify-center font-medium w-[95%] mx-auto bg-black hover:bg-slate-950 cursor-pointer duration-0 rounded-lg text-white">
                     <h3 className="">Signup with Google</h3>
                     <img className='w-6 h-6' src={googleLogo} alt="" />
-                </div>
+                </div> */}
                 <div className="flex justify-center text-sm">
                     already have an account? <Link className='text-blue-700 ml-2' to={'/login'}>Login</Link>
                 </div>

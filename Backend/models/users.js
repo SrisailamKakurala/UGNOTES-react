@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     password: String,
     profile: {
         type: String,
-        default: 'https://www.pngarts.com/files/10/Default-Profile-Picture-Download-PNG-Image.png'
+        default: 'http://localhost:3000/uploads/defaultProfile.jpg',
     },
     posts: [
         {

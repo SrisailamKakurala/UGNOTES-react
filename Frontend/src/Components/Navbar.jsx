@@ -1,13 +1,24 @@
-import { Link } from 'react-router-dom'
-import logo from '../assets/logo.png'
-import { useState } from 'react'
+import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
+import { useState, useEffect } from 'react';
 import { useUser } from '../Context/UserContext';
 
 const Navbar = () => {
+  
+  const { trigger } = useUser()
+  const [dummy, setDummy] = useState(null);
+  const [Home, setHome] = useState(true);
+  const [Addnotes, setAddnotes] = useState(false);
+  const [userProfile, setUserProfile] = useState('');
 
-  const { userProfile } = useUser();
-  const [Home, setHome] = useState(true)
-  const [Addnotes, setAddnotes] = useState(false)
+  useEffect(() => {
+    // Fetch user information from local storage
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (userData && userData.profile) {
+      setUserProfile(userData.profile);
+    }
+    setDummy(prev => !prev);
+  }, [trigger]);
 
   return (
     <div className="relative z-50 shadow-xl px-5 md:px-12 lg:px-20 py-2 flex justify-between items-center">
@@ -19,10 +30,10 @@ const Navbar = () => {
         <li onClick={() => { setHome(false); setAddnotes(true) }} className="hover:text-pink-500 cursor-pointer"><Link to={'/addnotes'}>Add Notes</Link> {Addnotes ? <hr className='h-1 rounded-lg bg-pink-500' /> : null}</li>
       </ul>
       <Link to={'/profile'}>
-        <img onClick={() => { setHome(false); setAddnotes(false) }} className='profile cursor-pointer rounded-full w-12 h-12' src={userProfile} alt="" />
+        <img onClick={() => { setHome(false); setAddnotes(false) }} className='profile cursor-pointer rounded-full w-12 h-12' src={userProfile} alt="User Profile" />
       </Link>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

@@ -6,10 +6,20 @@ import { useUser } from '../Context/UserContext';
 
 const Profile = () => {
 
-  const { userData, setUserData } = useUser();
+  const { trigger, setTrigger, loadProfile } = useUser();
+  const defaultProfile = `http://localhost:3000/uploads/defaultProfile.png`;
   const fileRef = useRef(null)
+  const [userData, setUserData] = useState(null);
+  const dummy = useRef(null);
 
-  
+  useEffect(() => {
+    // Retrieve user data from local storage
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      setUserData(userData);
+    }
+  }, [trigger, loadProfile]);
 
   const OpenFiles = () => {
     fileRef.current.click()
@@ -29,9 +39,22 @@ const Profile = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
+      if (response.data) {
+        // Retrieve userData from local storage
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+          const userData = JSON.parse(userDataString);
 
-      // SEND USERDATA_ID TO BACKEND AND RECIEVE THE USER PROFILE IMG AND ADD TO CONTEXT 
-      // setUserProfile(`http://localhost:3000/uploads/${filename}`)
+          // Update the profile field in userData
+          userData.profile = `${response.data}`;
+
+          // Store the updated userData back into local storage
+          localStorage.setItem('userData', JSON.stringify(userData));
+
+          // re-render 
+          setTrigger(prev => !prev);
+        }
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       // Handle error, e.g., show an error message
@@ -39,32 +62,32 @@ const Profile = () => {
   };
 
   return (
-    <div className="px-5  md:px-12 lg:px-20 h-[87.5vh] w-[100%] py-10 shadow-inner-2xl flex flex-col ">
+    <div className="px-5 md:px-12 lg:px-20 h-[87.5vh] w-[100%] py-10 shadow-inner-2xl flex flex-col ">
       <div className="top lg:grid lg:grid-cols-3 lg:justify-start gap-2  w-[100%] ">
 
         <div className="flex justify-around col-span-2 items-center w-[60] text-sm md:text-lg lg:text-xl">
           {/* profileImg */}
           <div className="left flex justify-start lg:justify-center xl:justify-center items-center relative">
-            <img className='w-28 h-28 rounded-full lg:w-40 md:w-32 sm:w-28 lg:h-40 md:h-32 sm:h-28' src={userData?.profile} alt="" />
+            <img className='w-28 h-28 rounded-full lg:w-40 md:w-32 sm:w-28 lg:h-40 md:h-32 sm:h-28' src={userData?.profile || defaultProfile} alt="" />
             <input ref={fileRef} type="file" hidden name='profileImg' accept="image/*" onChange={handleFileChange} />
             {/* edit icon */}
-            <div onClick={OpenFiles} className="cursor-pointer absolute bottom-3 right-5 rounded-full w-6 h-6 flex justify-center items-center bg-slate-900">
+            <div onClick={OpenFiles} className="cursor-pointer absolute bottom-3 right-2 rounded-full w-6 h-6 flex justify-center items-center bg-slate-900">
               <i className="fa-solid fa-pen fa-xs text-white"></i>
             </div>
           </div>
           {/* userInfo */}
           <div className="mid flex flex-col  gap-5">
             <div className="username flex gap-5">
-              <label className='text-slate-700 text-wrap' htmlFor="">Username: </label>
-              <h3 className=''>{(userData && userData.username)} </h3>
+              <label className='text-slate-700  text-wrap' htmlFor="">Username: </label>
+              <h3 className='font-medium'>{(userData && userData.username)} </h3>
             </div>
             <div className="postCount flex gap-5">
-              <label className='text-slate-700' htmlFor="">Pdf's uploaded: </label>
-              <h3 className=''>{(userData && userData.posts.length)}</h3>
+              <label className='text-slate-700 ' htmlFor="">Pdf's uploaded: </label>
+              <h3 className='font-medium'>{(userData && userData.posts && userData.posts.length > 0 ? userData.posts.length : 0)}</h3>
             </div>
             <div className="downloadCount flex gap-5">
-              <label className='text-slate-700' htmlFor="">Downloads: </label>
-              <h3 className=''>{(userData && userData.downloads)}</h3>
+              <label className='text-slate-700 ' htmlFor="">Downloads: </label>
+              <h3 className='font-medium'>{(userData && userData.downloads)}</h3>
             </div>
           </div>
         </div>
@@ -83,13 +106,14 @@ const Profile = () => {
         <hr className='h-1 bg-pink-300' />
       </div>
 
-      <div name='pdf-container' className=" w-[100%] grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-10 justify-items-center bg-white">
-        <Pdf />
-        <Pdf />
-        <Pdf />
-        <Pdf />
-        <Pdf />
-        <Pdf />
+      <div name='pdf-container' className=" w-[100%] grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-10 justify-items-center bg-white pb-8">
+        {userData && userData.posts && userData.posts.length > 0 ? (
+          userData.posts.slice().reverse().map((post, index) => (
+            <Pdf key={index} post={post} />
+          ))
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   )

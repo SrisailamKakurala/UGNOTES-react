@@ -1,6 +1,16 @@
 
 
 
+HANDLE THE INPUT IN HOME PAGE
+
+
+
+
+
+
+
+
+
 on login or register store user data in session
 
 on load of home page retrieve the user data from session and store in context 

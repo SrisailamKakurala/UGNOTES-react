@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './Components/Navbar';
 import Home from './Pages/Home';
@@ -9,8 +9,7 @@ import Login from './Pages/Login';
 import Signup from './Pages/Signup';
 
 const App = () => {
-
-
+  
   // Get the current location
   const location = useLocation();
 
