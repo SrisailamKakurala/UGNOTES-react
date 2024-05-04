@@ -12,6 +12,8 @@ const chapterModel = require('./models/chapters')
 const subjectModel = require('./models/subjects')
 const upload = require('./multer')
 const path = require('path')
+const fs = require('fs');
+
 
 
 const secretKey = process.env.SECRET_KEY;
@@ -112,7 +114,7 @@ app.post('/uploadPdf', upload.single('pdf-file'), async (req, res) => {
         subject: req.body.subject,
         topics: req.body.topics,
         qualification: req.body.qualification,
-        filename: req.file.originalname,
+        filename: req.file.filename,
         author: userData.username,
         authorId: userData._id,
     });
@@ -263,6 +265,34 @@ app.get('/getChapterPdfs', async (req, res) => {
     res.send(posts);
 });
 
+
+
+// Backend route to download PDF
+app.get('/downloadPdf', async (req, res) => {
+    try {
+        const pdf = await postModel.findById(req.query.id);
+        if (!pdf) {
+            return res.status(404).send("PDF not found");
+        }
+        
+        const filePath = path.join(__dirname, 'public/uploads', pdf.filename);
+
+        // Check if the file exists
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).send("File not found");
+        }
+
+        // Set content-disposition header to trigger download
+        res.setHeader('Content-Disposition', `attachment; filename="${pdf.chapter}"`);
+        
+        // Send the file
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Error downloading PDF');
+    }
+});
 
 
 
