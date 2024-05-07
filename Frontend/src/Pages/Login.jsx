@@ -11,10 +11,10 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
-    const userData = {
-        username: username,
-        password: password
-    }
+    // const userData = {
+    //     username: username,
+    //     password: password
+    // }
 
     const handleLogin = async () => {
         if (username !== '' && password !== '') {

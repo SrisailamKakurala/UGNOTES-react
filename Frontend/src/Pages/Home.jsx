@@ -4,21 +4,31 @@ import axios from "axios";
 import { useUser } from "../Context/UserContext";
 
 const Home = () => {
+
+  // dummy state to trigger the home page re-render
   const { loadHome } = useUser()
+
   const [option, setOption] = useState("");
   const [chapter, setChapter] = useState("");
+
+  // all subjects will be displayed in select tag for the user to choose from for selecting
   const [allSubjects, setAllSubjects] = useState([]);
+  // the chapters which starts with the letters user searched in input tag 
   const [searchedChapters, setSearchedChapters] = useState([]);
 
+  // let the user to only search either through select or input
   const [inputDisabled, setInputDisabled] = useState(false);
   const [selectDisabled, setSelectDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // searching the notes through select and input tags and storing the pdf's info
   const [optionRes, setOptionRes] = useState([]);
   const [inputRes, setInputRes] = useState([]);
 
 
   useEffect(() => {
+
+    // get all subjects in db to show in select tag
     const loadSubjects = async () => {
       try {
         const res = await axios.get('http://localhost:3000/getSubjects')
@@ -30,6 +40,8 @@ const Home = () => {
     loadSubjects()
   }, [loadHome])
 
+  
+  // let the user to only search either through select or input
   const handleOptionChange = (e) => {
     if (e.target.value === " ") {
       setInputDisabled(false);
@@ -47,14 +59,15 @@ const Home = () => {
       setSelectDisabled(true);
     }
     setChapter(e.target.value);
+    // load chapters when searched in input tag
     const res = await axios.get(`http://localhost:3000/getChapters/${e.target.value}`)
       .then((data) => {
         setSearchedChapters(data.data)
-        console.log(data.data)
       })
   };
 
 
+  // final search on click of search button
   const handleSearch = async () => {
     if (option !== "") {
       try {
@@ -62,7 +75,7 @@ const Home = () => {
         const res = await axios.get(`http://localhost:3000/getSubjectPdfs?option=${option}`);
         setOptionRes(res.data)
         setIsLoading(false)
-        console.log(res.data)
+        // console.log(res.data)
       } catch (err) {
         console.log(err)
       }

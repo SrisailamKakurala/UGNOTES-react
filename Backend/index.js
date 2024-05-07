@@ -4,8 +4,6 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const bcrypt = require('bcrypt')
-const cookieParser = require('cookie-parser');
-const expressSession = require('express-session');
 const userModel = require('./models/users')
 const postModel = require('./models/posts')
 const chapterModel = require('./models/chapters')
@@ -15,23 +13,12 @@ const path = require('path')
 const fs = require('fs');
 
 
-
-const secretKey = process.env.SECRET_KEY;
-
-
 // middlewares
 app.use(express.json())
 app.use(cors())
-app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'))
 
-// passport setup 
-app.use(expressSession({
-    saveUninitialized: true,
-    resave: true,
-    secret: secretKey
-}))
 
 // Register endpoint
 app.post('/', async (req, res) => {
@@ -69,7 +56,7 @@ app.post('/', async (req, res) => {
 
 
 // Login endpoint
-app.post('/login', async function (req, res, next) {
+app.post('/login', async function (req, res) {
     try {
         // Extract login credentials from request body
         const { username, password } = req.body;
@@ -101,7 +88,6 @@ app.post('/profileUpdate', upload.single('profileImg'), async (req, res) => {
     const user = await userModel.findOne({ _id: req.body.userId });
     user.profile = `http://localhost:3000/uploads/${req.file.filename}`;
     await user.save()
-    // Process the uploaded file, e.g., save it to a database or file system
     res.send(user.profile);
 });
 
@@ -251,6 +237,7 @@ app.get('/getChapters/', async (req, res) => {
 })
 
 
+// searching pdf's by select tag
 app.get('/getSubjectPdfs', async (req, res) => {
     const option = req.query.option;
     const posts = await postModel.find({ subject: option })
@@ -258,13 +245,13 @@ app.get('/getSubjectPdfs', async (req, res) => {
 });
 
 
+// searching pdf's by input tag
 app.get('/getChapterPdfs', async (req, res) => {
     const chapters = req.query.chapter;
     const posts = await postModel.find({ chapter: chapters })
     // console.log(posts)
     res.send(posts);
 });
-
 
 
 // Backend route to download PDF

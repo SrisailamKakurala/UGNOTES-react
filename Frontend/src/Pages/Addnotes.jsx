@@ -3,13 +3,20 @@ import axios from 'axios';
 import { useUser } from "../Context/UserContext";
 
 const Addnotes = () => {
+
+  // dummy states to render something 
   const { loadHome, setLoadHome } = useUser()
   const [trigger, setTrigger] = useState()
+
+  // for file selection confirmation
   const [fileSelected, setFileSelected] = useState(false)
+
+  // let the user to only input either through select or input
   const [inputDisabled, setInputDisabled] = useState(false)
   const [selectDisabled, setSelectDisabled] = useState(false)
   const [showUploadAlert, setShowUploadAlert] = useState(false);
 
+  // post details states
   const [title, setTitle] = useState()
   const [option, setOption] = useState()
   const [subject, setSubject] = useState()
@@ -40,6 +47,10 @@ const Addnotes = () => {
       }
     }
     loadSubjects()
+
+    // restore updated userdata in local-storage after post upload 
+    // on post upload the trigger state will be changed, which calls the useEffect to store 
+    // new user Data in local storage
     async function getUserData() {
       const userDataString = localStorage.getItem('userData');
       const userData = JSON.parse(userDataString);

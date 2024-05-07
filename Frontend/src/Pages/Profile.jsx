@@ -51,7 +51,7 @@ const Profile = () => {
           // Store the updated userData back into local storage
           localStorage.setItem('userData', JSON.stringify(userData));
 
-          // re-render 
+          // re-render this page's useEffect and navbar's useEffect which results in profile pic updation
           setTrigger(prev => !prev);
         }
       }
