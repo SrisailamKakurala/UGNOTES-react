@@ -25,7 +25,7 @@ const Pdf = ({ post }) => {
         try {
             // Fetch PDF details using the post ID or any other identifier
             if (post) {
-                const response = await axios.get(`http://localhost:3000/pdfDetails/${post}`);
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/pdfDetails/${post}`);
                 setPdfDetails(response.data);
                 // console.log(response.data)
             }
@@ -46,7 +46,7 @@ const Pdf = ({ post }) => {
         if (userDataString) {
             const userData = JSON.parse(userDataString);
             try {
-                const res = await axios.post('http://localhost:3000/likePdf', {
+                const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/likePdf`, {
                     userId: userData._id,
                     postId: post
                 });
@@ -72,7 +72,7 @@ const Pdf = ({ post }) => {
         if (userDataString) {
             const userData = JSON.parse(userDataString);
             try {
-                const res = await axios.post('http://localhost:3000/deletePdf', {
+                const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/deletePdf`, {
                     userId: userData._id,
                     postId: post
                 });

@@ -20,7 +20,7 @@ const Login = () => {
         if (username !== '' && password !== '') {
             try {
                 const userData = { username, password };
-                const response = await axios.post('http://localhost:3000/login', userData);
+                const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/login`, userData);
                 if (response.data) {
                     // Store user data in local storage
                     localStorage.setItem('userData', JSON.stringify(response.data.user));

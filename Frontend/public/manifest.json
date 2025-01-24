@@ -1,0 +1,32 @@
+{
+    "short_name": "Notes4You",
+    "name": "My Progressive Web App",
+    "icons": [
+      {
+        "src": "maskable_icon.png",
+        "type": "image/png",
+        "sizes": "196x196",
+        "purpose:": "any maskable"
+      },
+      {
+        "src": "192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "256.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      },
+      {
+        "src": "512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": "/",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#000000"
+  }

@@ -18,7 +18,7 @@ const Pdfinfo = () => {
 
     const handleDownload = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/downloadPdf?id=${pdfInfo._id}`, {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/downloadPdf?id=${pdfInfo._id}`, {
                 responseType: 'blob' // Specify responseType as blob for downloading binary data
             });
 

@@ -40,7 +40,7 @@ const Addnotes = () => {
   useEffect(() => {
     const loadSubjects = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/getSubjects')
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getSubjects`)
         setAllSubjects(res.data)
       } catch (err) {
         console.log(err)
@@ -54,7 +54,7 @@ const Addnotes = () => {
     async function getUserData() {
       const userDataString = localStorage.getItem('userData');
       const userData = JSON.parse(userDataString);
-      const res = await axios.get(`http://localhost:3000/getuser/${userData._id}`)
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getuser/${userData._id}`)
       localStorage.setItem('userData', JSON.stringify(res.data));
     }
     getUserData()
@@ -110,7 +110,7 @@ const Addnotes = () => {
         const userData = JSON.parse(userDataString);
         formData.append('userId', userData._id);
 
-        const response = await axios.post('http://localhost:3000/uploadPdf', formData);
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/uploadPdf`, formData);
         if (response.data === 'uploaded') {
           setTrigger('load')
 

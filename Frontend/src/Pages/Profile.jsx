@@ -7,7 +7,7 @@ import { useUser } from '../Context/UserContext';
 const Profile = () => {
 
   const { trigger, setTrigger, loadProfile } = useUser();
-  const defaultProfile = `http://localhost:3000/uploads/defaultProfile.png`;
+  const defaultProfile = `${import.meta.env.VITE_BACKEND_URL}/uploads/defaultProfile.png`;
   const fileRef = useRef(null)
   const [userData, setUserData] = useState(null);
   const dummy = useRef(null);
@@ -34,7 +34,7 @@ const Profile = () => {
 
     try {
       // Send Axios request to upload the image
-      const response = await axios.post('http://localhost:3000/profileUpdate', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/profileUpdate`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

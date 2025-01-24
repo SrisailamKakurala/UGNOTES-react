@@ -22,7 +22,7 @@ const Signup = () => {
         if (username !== '' && password !== '' && email !== '') {
             try {
                 const userdata = { username, email, password };
-                const response = await axios.post('http://localhost:3000/', userdata);
+                const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}`, userdata);
                 if (response.data.newUser) {
                     // Store user data in local storage
                     localStorage.setItem('userData', JSON.stringify(response.data.newUser));

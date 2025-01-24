@@ -31,7 +31,7 @@ const Home = () => {
     // get all subjects in db to show in select tag
     const loadSubjects = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/getSubjects')
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getSubjects`)
         setAllSubjects(res.data)
       } catch (err) {
         console.log(err)
@@ -60,7 +60,7 @@ const Home = () => {
     }
     setChapter(e.target.value);
     // load chapters when searched in input tag
-    const res = await axios.get(`http://localhost:3000/getChapters/${e.target.value}`)
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getChapters/${e.target.value}`)
       .then((data) => {
         setSearchedChapters(data.data)
       })
@@ -72,7 +72,7 @@ const Home = () => {
     if (option !== "") {
       try {
         setIsLoading(true)
-        const res = await axios.get(`http://localhost:3000/getSubjectPdfs?option=${option}`);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getSubjectPdfs?option=${option}`);
         setOptionRes(res.data)
         setIsLoading(false)
         // console.log(res.data)
@@ -82,7 +82,7 @@ const Home = () => {
     } else {
       try {
         setIsLoading(true)
-        const res = await axios.get(`http://localhost:3000/getChapterPdfs?chapter=${chapter}`);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getChapterPdfs?chapter=${chapter}`);
         setInputRes(res.data)
         setIsLoading(false)
         console.log(res.data)
